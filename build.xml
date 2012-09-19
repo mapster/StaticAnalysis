@@ -1,0 +1,25 @@
+<project name="StaticAnalysis" default="run" basedir=".">
+
+	<!-- Generate folders -->
+	<target name="init">
+        <mkdir dir="build/classes" />
+	</target>
+
+	<!-- Compiling -->
+	<target name="compile" depends="init">
+        <javac srcdir="src" destdir="build/classes">
+		</javac>
+	</target>
+
+	<!-- Run jar-archive -->
+	<target name="run" depends="compile">
+        <java classname="org.mapster.ast.CompileTest" classpath="build/classes">
+            <arg value="src/org/mapster/ast/demo/Main.java"/>
+        </java>
+	</target>
+
+	<!-- Delete created files -->
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+</project>

@@ -1,7 +1,8 @@
 package org.mapster.ast;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
@@ -15,6 +16,26 @@ import com.sun.source.util.Trees;
 public class CompileTest {
 
 	public static void main(String[] args) throws IOException {
+		ArrayList<File> sourceFiles = new ArrayList<>();
+		if(args.length == 0){
+			System.out.println("Please specify java source files to analyse.");
+			return;
+		}
+		else {
+			for(String s: args){
+				if(!s.endsWith(".java")){
+					System.out.println("All arguments must be java files.");
+					return;
+				}
+				File f = new File(s);
+				if(!f.isFile()){
+					System.out.println("Could not find file with path: " +f.getAbsolutePath());
+					return;
+				}
+				sourceFiles.add(f);
+			}
+		}
+		
 		// //Get an instance of java compiler
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
@@ -25,8 +46,7 @@ public class CompileTest {
 		// Get the list of java file objects, in this case we have only
 		// one file, TestClass.java
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager
-				.getJavaFileObjectsFromStrings(Arrays
-						.asList("/home/mapster/eclipses/workspaces/ProcessorTest/srctest/org/mapster/myproj/Main.java"));
+				.getJavaFileObjectsFromFiles(sourceFiles);
 
 		CompilationTask task = compiler.getTask(null, fileManager, null, null,
 				null, compilationUnits);
