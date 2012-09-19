@@ -9,12 +9,8 @@ import javax.tools.Diagnostic;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.CompoundAssignmentTree;
-import com.sun.source.tree.ConditionalExpressionTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.UnaryTree;
-import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
@@ -22,12 +18,6 @@ import com.sun.source.util.Trees;
 public class WhileVisitor extends TreePathScanner<Set<String>, Trees> {
 	private CompilationUnitTree compilationUnit;
 
-//	public Set<String> scan(CompilationUnitTree compilationUnit, Trees trees){
-//		this.compilationUnit = compilationUnit;
-//		System.out.println("i egen scan");
-//		return super.scan(compilationUnit, trees);
-//	}
-	
 	public Set<String> scan(Iterable<? extends CompilationUnitTree> nodes, Trees trees){
         Set<String> r = null;
         if (nodes != null) {
@@ -41,34 +31,33 @@ public class WhileVisitor extends TreePathScanner<Set<String>, Trees> {
         return r;
 	}
 	
-
 	@Override
-	public Set<String> reduce(Set<String> arg0, Set<String> arg1) {
-		if(arg0 == null)
-			arg0 = new HashSet<>();
-		if(arg1 == null)
-			arg1= new HashSet<>();
-		arg0.addAll(arg1);
-		return arg0;
+	public Set<String> reduce(Set<String> s1, Set<String> s2) {
+		if(s1 == null)
+			s1 = new HashSet<>();
+		if(s2 == null)
+			s2= new HashSet<>();
+		s1.addAll(s2);
+		return s1;
 	}
 
 	@Override
-	public Set<String> visitWhileLoop(WhileLoopTree arg0, Trees arg1) {
-		Set<String> assignments = super.visitWhileLoop(arg0, arg1);
+	public Set<String> visitWhileLoop(WhileLoopTree whileLoopTree, Trees trees) {
+		Set<String> assignments = super.visitWhileLoop(whileLoopTree, trees);
 		
 		IdentifierScanner sc = new IdentifierScanner();
-		Set<String> conditions = sc.scan(arg0.getCondition(), arg1);
+		Set<String> conditions = sc.scan(whileLoopTree.getCondition(), trees);
 
 		if(conditions.isEmpty()){
 			String msg = "The condition of the while-loop has a conststant expression. (i.e. no variables are used)";
-			arg1.printMessage(Diagnostic.Kind.WARNING, msg, arg0.getCondition(), compilationUnit);
+			trees.printMessage(Diagnostic.Kind.WARNING, msg, whileLoopTree.getCondition(), compilationUnit);
 			
 		}
 		else {
 			conditions.retainAll(assignments);
 			if(conditions.isEmpty()){
 				String msg = ("None of the variables in the while-loop condition are subject to change (assignment) in the loop-body.");
-				arg1.printMessage(Diagnostic.Kind.WARNING, msg, arg0.getStatement(), compilationUnit);
+				trees.printMessage(Diagnostic.Kind.WARNING, msg, whileLoopTree.getStatement(), compilationUnit);
 			}
 		}
 		return assignments;
@@ -82,39 +71,21 @@ public class WhileVisitor extends TreePathScanner<Set<String>, Trees> {
 	}
 
 	@Override
-	public Set<String> visitUnary(UnaryTree arg0, Trees arg1) {
+	public Set<String> visitUnary(UnaryTree unaryTree, Trees trees) {
 		Set<String> s = new HashSet<>();
-		if(arg0.getKind().equals(Kind.POSTFIX_DECREMENT) || 
-		   arg0.getKind().equals(Kind.POSTFIX_INCREMENT) ||
-		   arg0.getKind().equals(Kind.PREFIX_DECREMENT)  ||
-		   arg0.getKind().equals(Kind.PREFIX_INCREMENT)){
+		if(unaryTree.getKind().equals(Kind.POSTFIX_DECREMENT) || 
+		   unaryTree.getKind().equals(Kind.POSTFIX_INCREMENT) ||
+		   unaryTree.getKind().equals(Kind.PREFIX_DECREMENT)  ||
+		   unaryTree.getKind().equals(Kind.PREFIX_INCREMENT)){
 			IdentifierScanner sc = new IdentifierScanner();
-			s.addAll(sc.scan(arg0.getExpression(), arg1));
+			s.addAll(sc.scan(unaryTree.getExpression(), trees));
 		}
 		return s;
 	}
 
 	@Override
-	public Set<String> visitCompoundAssignment(CompoundAssignmentTree arg0,	Trees arg1) {
-		return new HashSet<>(Arrays.asList(arg0.getVariable().toString()));
+	public Set<String> visitCompoundAssignment(CompoundAssignmentTree assignmentTree, Trees trees) {
+		return new HashSet<>(Arrays.asList(assignmentTree.getVariable().toString()));
 	}
-	
-	
-
-//	@Override
-//	public Set<String> visitBinary(BinaryTree arg0, Trees arg1) {
-//		Set<String> s = new HashSet<>();
-//		System.out.println("visiting: " + arg0.toString() + ", " + arg0.getLeftOperand().toString() + ":" + arg0.getLeftOperand().getKind() + ", " + arg0.getRightOperand().toString() + ":" + arg0.getRightOperand().getKind());
-//		s.add(arg0.toString());
-//		return super.visitBinary(arg0, arg1);
-//	}
-
-//	@Override
-//	public Set<String> visitIdentifier(IdentifierTree arg0, Trees arg1) {
-//		Set<String> s = new HashSet<>();
-//		s.add(arg0.getName().toString());
-//		return s;
-//	}
-	
 
 }

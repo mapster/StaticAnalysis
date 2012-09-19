@@ -3,18 +3,14 @@ package org.mapster.ast;
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.util.*;
-import com.sun.tools.javac.api.JavacTaskImpl;
-
-import demo.codeanalyzer.processor.CodeAnalyzerTreeVisitor;
+import com.sun.source.util.JavacTask;
+import com.sun.source.util.Trees;
 
 public class CompileTest {
 
@@ -38,7 +34,6 @@ public class CompileTest {
 
 		WhileVisitor visitor = new WhileVisitor();
 		Trees trees = Trees.instance(task);
-		int i = 0;
-		visitor.scan(javacTask.parse(), trees);
+  		visitor.scan(javacTask.parse(), trees);
 	}
 }

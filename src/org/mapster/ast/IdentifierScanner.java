@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.sun.source.tree.IdentifierTree;
-import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.TreeScanner;
 import com.sun.source.util.Trees;
 
