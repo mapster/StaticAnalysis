@@ -13,7 +13,11 @@
 
 	<!-- Run jar-archive -->
 	<target name="run" depends="compile">
-        <java classname="org.mapster.ast.CompileTest" classpath="build/classes">
+        <java classname="org.mapster.ast.CompileTest">
+            <classpath>
+                <pathelement path="build/classes"/>
+                <pathelement path="lib/tools.jar"/>
+            </classpath>
             <arg value="src/org/mapster/ast/demo/Main.java"/>
         </java>
 	</target>

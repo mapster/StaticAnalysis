@@ -1,24 +1,23 @@
 package org.mapster.ast;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
-import javax.tools.JavaCompiler;
+import javax.tools.*;
 import javax.tools.JavaCompiler.CompilationTask;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
-import com.sun.source.tree.ClassTree;
+import org.mapster.myast.*;
+import org.w3c.dom.Element;
+
+import com.google.gson.*;
 import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.JavacTask;
-import com.sun.source.util.Trees;
+import com.sun.source.util.*;
 
-public class CompileTest {
 
-	public static void main(String[] args) throws IOException {
+public class Main {
+	public static void main(String[] args) throws IOException, ParserConfigurationException, TransformerException, WriteToStreamFailure {
 		ArrayList<File> sourceFiles = new ArrayList<>();
 		if(args.length == 0){
 			System.out.println("Please specify java source files to analyse.");
@@ -55,16 +54,25 @@ public class CompileTest {
 				null, compilationUnits);
 		JavacTask javacTask = (JavacTask) task;
 
-		WhileVisitor visitor = new WhileVisitor();
 		Trees trees = Trees.instance(task);
-//  		visitor.scan(javacTask.parse(), trees);
-		for(CompilationUnitTree cuTree : javacTask.parse()){
-			for(Tree tr1: cuTree.getTypeDecls()){
-				ClassTree ct = (ClassTree)tr1;
-				
-				System.out.println(ct.getClass() + " " + ct.getSimpleName());
-			}
-			
+////  		visitor.scan(javacTask.parse(), trees);
+//		for(CompilationUnitTree cuTree : javacTask.parse()){
+//			System.out.println(cuTree.getPackageName());
+//			for(Tree tr1: cuTree.getTypeDecls()){
+//				ClassTree ct = (ClassTree)tr1;
+//				ClassNode n = ClassNode.buildClass(ct);
+//			}
+//		}
+		Gson gson2 = new GsonBuilder().
+		Gson gson = new Gson();
+		gson.toJson(javacTask.parse().iterator().next());
+		
+		XmlDocument xmldoc = new XmlDocument();
+		MyTreePathScanner<Element> scanner = new MyTreePathScanner<>(xmldoc);
+		for(CompilationUnitTree tree: javacTask.parse()){
+			scanner.buildDocument(tree, trees);
 		}
+
+		xmldoc.writeToStream(System.out);
 	}
 }
