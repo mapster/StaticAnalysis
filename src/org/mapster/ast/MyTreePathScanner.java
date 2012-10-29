@@ -1,6 +1,7 @@
 package org.mapster.ast;
 import java.util.*;
 
+import javax.lang.model.element.Modifier;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.mapster.myast.*;
@@ -249,9 +250,8 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 			throw new NotDefinedYetException("Method default value action not implemented: " + methodTree.getDefaultValue());
 
 		methodNode.setName(methodTree.getName());
-		
+		methodNode.setModifiers(scan(methodTree.getModifiers(), trees));
 		methodTree.getBody();
-		System.out.println(methodTree.getModifiers());
 		methodTree.getParameters();
 		methodTree.getReturnType();
 		methodTree.getTypeParameters();
@@ -267,10 +267,15 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitModifiers(ModifiersTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitModifiers(ModifiersTree modifiersTree, Trees trees) {
+		AstIntermediaryNode<E> modifiersNode = document.createNode("modifiers");
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		List<String> mods = new LinkedList<>();
+		for(Modifier m: modifiersTree.getFlags())
+			mods.add(m.toString());
+		modifiersNode.setValue(mods);
+		
+		return modifiersNode;		
 	}
 
 	@Override

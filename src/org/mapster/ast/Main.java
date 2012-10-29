@@ -9,9 +9,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.mapster.myast.*;
-import org.w3c.dom.Element;
 
-import com.google.gson.*;
+import com.google.gson.JsonElement;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.util.*;
 
@@ -63,16 +62,16 @@ public class Main {
 //				ClassNode n = ClassNode.buildClass(ct);
 //			}
 //		}
-		Gson gson2 = new GsonBuilder().
-		Gson gson = new Gson();
-		gson.toJson(javacTask.parse().iterator().next());
 		
-		XmlDocument xmldoc = new XmlDocument();
-		MyTreePathScanner<Element> scanner = new MyTreePathScanner<>(xmldoc);
+		XmlDocument xmlDoc = new XmlDocument();
+		JsonDocument jsonDoc = new JsonDocument();
+		
+		MyTreePathScanner<JsonElement> scanner = new MyTreePathScanner<>(jsonDoc);
 		for(CompilationUnitTree tree: javacTask.parse()){
 			scanner.buildDocument(tree, trees);
 		}
 
-		xmldoc.writeToStream(System.out);
+		jsonDoc.writeToStream(System.out);
+//		xmlDoc.writeToStream(System.out);
 	}
 }
