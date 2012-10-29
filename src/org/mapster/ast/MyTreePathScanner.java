@@ -106,6 +106,8 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	public AstIntermediaryNode<E> visitClass(ClassTree classTree, Trees trees) {
 		AstIntermediaryNode<E> classNode = document.createNode("class");
 		classNode.setName(classTree.getSimpleName());
+		classNode.setPosition(trees.getSourcePositions().getStartPosition(compilationUnit, classTree), 
+							  trees.getSourcePositions().getEndPosition(compilationUnit, classTree));
 
 		
 		for(AstIntermediaryNode<E> memberNode: scan(classTree.getMembers(), trees)){
@@ -239,12 +241,24 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitMethod(MethodTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitMethod(MethodTree methodTree, Trees trees) {
+		AstIntermediaryNode<E> methodNode = document.createNode("method");
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
-	}
+		//throw exception if defaultValue is set (we don't handle it)
+		if(methodTree.getDefaultValue() != null)
+			throw new NotDefinedYetException("Method default value action not implemented: " + methodTree.getDefaultValue());
 
+		methodNode.setName(methodTree.getName());
+		
+		methodTree.getBody();
+		System.out.println(methodTree.getModifiers());
+		methodTree.getParameters();
+		methodTree.getReturnType();
+		methodTree.getTypeParameters();
+		
+		return methodNode;
+	}
+	
 	@Override
 	public AstIntermediaryNode<E> visitMethodInvocation(MethodInvocationTree arg0, Trees arg1) {
 		// TODO Auto-generated method stub
@@ -389,8 +403,5 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		
 		throw new NotDefinedYetException(arg0.getKind().toString());
 	}
-	
-
-	
 	
 }
