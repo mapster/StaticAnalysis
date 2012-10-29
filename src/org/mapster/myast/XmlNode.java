@@ -1,5 +1,7 @@
 package org.mapster.myast;
 
+import java.util.List;
+
 import javax.lang.model.element.Name;
 
 import org.w3c.dom.Element;
@@ -40,6 +42,16 @@ public class XmlNode implements AstIntermediaryNode<Element> {
 	@Override
 	public Element getNode() {
 		return element;
+	}
+
+	@Override
+	public void setModifiers(AstIntermediaryNode<Element> modifiers) {
+		throw new Error("not implemented yet");
+	}
+
+	@Override
+	public void setValue(List<String> nodes) {
+		throw new Error("not implemented yet");		
 	}
 
 }

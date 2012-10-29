@@ -1,8 +1,8 @@
 package org.mapster.myast;
 
-import java.util.Set;
+import java.util.List;
 
-import javax.lang.model.element.*;
+import javax.lang.model.element.Name;
 
 import com.google.gson.*;
 
@@ -35,6 +35,15 @@ public class JsonNode implements AstIntermediaryNode<JsonElement> {
 	public void setValue(String value) {
 		element.addProperty("value", value);
 	}
+	
+	@Override
+	public void setValue(List<String> values){
+		JsonArray array = new JsonArray();
+		for(String s: values)
+			array.add(new JsonPrimitive(s));
+		
+		element.add("value", array);
+	}
 
 	@Override
 	public void addChild(AstIntermediaryNode<JsonElement> node) {
@@ -59,11 +68,8 @@ public class JsonNode implements AstIntermediaryNode<JsonElement> {
 	}
 
 	@Override
-	public void setModifiers(Set<Modifier> modifiers) {
-		JsonArray array = new JsonArray();
-		for(Modifier m: modifiers)
-			array.add(new JsonPrimitive(m.toString()));
-		element.add("modifiers", array);
+	public void setModifiers(AstIntermediaryNode<JsonElement> modifiers) {
+		element.add("modifiers", modifiers.getNode());
 	}
 
 }
