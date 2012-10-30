@@ -24,7 +24,7 @@ public class JsonDocument implements AstIntermediary<JsonElement> {
 			JsonWriter w = new JsonWriter(new OutputStreamWriter(out, "UTF-8"));
 			Gson gson = new Gson();
 			gson.toJson(document, w);
-			w.close();
+			w.flush();
 		} catch (IOException e) {
 			throw new WriteToStreamFailure(e.getMessage());
 		}

@@ -1,20 +1,24 @@
 package org.mapster.ast.demo;
 
-public class Main {
+public class Main<E> {
 	int x;
 	
-	int x2 = 4;
+	static int x2 = 4;
 	
 	public int metode(){
 		return 0;
 	}
 	
-	public static void main(String[] args){
+	public static <T> void main(String[] args){
 		Main m = new Main();
-		m.method("a");
+//		m.method("a");
 	}
 	
-	public void method(String s){
+	public Main(){
+		
+	}
+	
+	public <T> void method(String s){
 		int a = 0;
 		int b = 0;
 		int c = 0;
@@ -34,6 +38,8 @@ public class Main {
 			y = y +1;
 		}
 	}
+	
+	
 	
 	public class Bla1 {
 		

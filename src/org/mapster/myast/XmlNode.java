@@ -19,8 +19,8 @@ public class XmlNode implements AstIntermediaryNode<Element> {
 	}
 
 	@Override
-	public void setType(String type) {
-		element.setAttribute("type", type);
+	public void setType(AstIntermediaryNode<Element> type) {
+		element.appendChild(type.getNode());
 	}
 
 	@Override
@@ -46,12 +46,12 @@ public class XmlNode implements AstIntermediaryNode<Element> {
 
 	@Override
 	public void setModifiers(AstIntermediaryNode<Element> modifiers) {
-		throw new Error("not implemented yet");
+//		throw new Error("not implemented yet");
 	}
 
 	@Override
 	public void setValue(List<String> nodes) {
-		throw new Error("not implemented yet");		
+//		throw new Error("not implemented yet");		
 	}
 
 }

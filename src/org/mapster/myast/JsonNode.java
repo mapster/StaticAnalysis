@@ -21,8 +21,8 @@ public class JsonNode implements AstIntermediaryNode<JsonElement> {
 	}
 
 	@Override
-	public void setType(String type) {
-		element.addProperty("type", type);
+	public void setType(AstIntermediaryNode<JsonElement> type) {
+		element.add("type", type.getNode());
 	}
 
 	@Override

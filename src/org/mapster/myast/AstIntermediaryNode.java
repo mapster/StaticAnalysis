@@ -7,7 +7,7 @@ import javax.lang.model.element.Name;
 public interface AstIntermediaryNode<E> {
 	public void setName(Name name);
 	public void setModifiers(AstIntermediaryNode<E> modifiers);
-	public void setType(String type);
+	public void setType(AstIntermediaryNode<E> type);
 	public void setPosition(long start, long end);
 	public void setValue(String value);
 	public void setValue(List<String> nodes);
