@@ -11,11 +11,45 @@ public class Mains<E> {
 	
 	public static void main(String[][] args){
 		Mains m = new Mains();
-		m.method("a", 2);
+		m.method("a", 2 > 1 ? 2 : 1);
 		System.out.println(args[1][2]);
+		
+		for(int i = 0; i < 10; i++){
+			
+		}
+		
+		if(m != null){
+			
+		}
+		else if(m == null){
+			
+		}
+		else {
+			
+		}
+		
+		switch(args[0][0]){
+		case "a":
+			break;
+		case "b":
+			break;
+		default:
+			break;
+		}
+			
+		
+		for(String s: args[0]){
+			;
+		}
 	}
 	
 	public Mains(){
+		try{
+			
+		}
+		catch(Exception e){
+			
+		}
 		
 	}
 	
@@ -35,13 +69,17 @@ public class Mains<E> {
 			while(c < 100){
 				++c;
 				--d;
+				break;
 			}
 			z += 1;
 			y = y +1;
+			continue;
 		}
+		
+		do {
+			;
+		} while(z < 0);
 	}
-	
-	
 	
 	public class Bla1 {
 		
