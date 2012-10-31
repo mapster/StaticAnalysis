@@ -70,10 +70,14 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitAssignment(AssignmentTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitAssignment(AssignmentTree assignmentTree, Trees trees) {
+		AstIntermediaryNode<E> assignmentNode = document.createNode("assignment");
+		setPosition(assignmentNode, assignmentTree, trees);
+
+		assignmentNode.setProperty("variable", scan(assignmentTree.getVariable(), trees));
+		assignmentNode.setProperty("expr", scan(assignmentTree.getExpression(), trees));
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		return assignmentNode;
 	}
 
 	@Override
@@ -141,11 +145,15 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitCompoundAssignment(CompoundAssignmentTree arg0,
-			Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitCompoundAssignment(CompoundAssignmentTree compAssignmentTree, Trees trees) {
+		AstIntermediaryNode<E> compAssignmentNode = document.createNode("compound_assignment");
+		setPosition(compAssignmentNode, compAssignmentTree, trees);
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		compAssignmentNode.setProperty("type", compAssignmentTree.getKind().toString());
+		compAssignmentNode.setProperty("expr", scan(compAssignmentTree.getExpression(), trees));
+		compAssignmentNode.setProperty("variable", scan(compAssignmentTree.getVariable(), trees));
+		
+		return compAssignmentNode;
 	}
 
 	@Override

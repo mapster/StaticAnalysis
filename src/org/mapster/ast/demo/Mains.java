@@ -21,6 +21,7 @@ public class Mains<E> {
 	
 	public void method(String streng, int tall){
 		int a = 0;
+		a = 1;
 		int b = 0;
 		int c = 0;
 		int d = 0;
