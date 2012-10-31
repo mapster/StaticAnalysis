@@ -9,7 +9,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.mapster.myast.*;
-import org.w3c.dom.Element;
 
 import com.google.gson.JsonElement;
 import com.sun.source.tree.CompilationUnitTree;
@@ -51,7 +50,7 @@ public class Main {
 				.getJavaFileObjectsFromFiles(sourceFiles);
 
 		CompilationTask task = compiler.getTask(null, fileManager, null, null,
-				null, compilationUnits);
+				null, compilationUnits);		
 		JavacTask javacTask = (JavacTask) task;
 
 		Trees trees = Trees.instance(task);
@@ -63,19 +62,18 @@ public class Main {
 //				ClassNode n = ClassNode.buildClass(ct);
 //			}
 //		}
-		
-		XmlDocument xmlDoc = new XmlDocument();
+//		XmlDocument xmlDoc = new XmlDocument();
 		JsonDocument jsonDoc = new JsonDocument();
 		
 		MyTreePathScanner<JsonElement> jsonScanner = new MyTreePathScanner<>(jsonDoc);
-		MyTreePathScanner<Element> xmlScanner = new MyTreePathScanner<>(xmlDoc);
+//		MyTreePathScanner<Element> xmlScanner = new MyTreePathScanner<>(xmlDoc);
 		for(CompilationUnitTree tree: javacTask.parse()){
 			jsonScanner.buildDocument(tree, trees);
-			xmlScanner.buildDocument(tree, trees);
+//			xmlScanner.buildDocument(tree, trees);
 		}
 
 		jsonDoc.writeToStream(System.out);
 		System.out.println();
-		xmlDoc.writeToStream(System.out);
+//		xmlDoc.writeToStream(System.out);
 	}
 }

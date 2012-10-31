@@ -1,13 +1,11 @@
 package org.mapster.myast;
 
-import java.util.List;
-
-import javax.lang.model.element.Name;
+import java.util.*;
 
 import com.google.gson.*;
 
 public class JsonNode implements AstIntermediaryNode<JsonElement> {
-	
+	private static final Set<String> RESERVED_PROPERTY_KEYS = new HashSet<>(Arrays.asList("children", "startPos", "endPos", "NODE_TYPE"));
 	private JsonObject element;
 
 	public JsonNode(String nodeType){
@@ -15,15 +13,6 @@ public class JsonNode implements AstIntermediaryNode<JsonElement> {
 		element.addProperty("NODE_TYPE", nodeType);
 	}
 
-	@Override
-	public void setName(Name name) {
-		element.addProperty("name", name.toString());
-	}
-
-	@Override
-	public void setType(AstIntermediaryNode<JsonElement> type) {
-		element.add("type", type.getNode());
-	}
 
 	@Override
 	public void setPosition(long start, long end) {
@@ -32,33 +21,27 @@ public class JsonNode implements AstIntermediaryNode<JsonElement> {
 	}
 
 	@Override
-	public void setValue(String value) {
-		element.addProperty("value", value);
-	}
-	
-	@Override
-	public void setValue(List<String> values){
-		JsonArray array = new JsonArray();
-		for(String s: values)
-			array.add(new JsonPrimitive(s));
+	public void addChild(AstIntermediaryNode<JsonElement> node) {
+		if(node == null)
+			return;
 		
-		element.add("value", array);
+		addChild(node.getNode());
 	}
 
 	@Override
-	public void addChild(AstIntermediaryNode<JsonElement> node) {
-		JsonElement children = element.get("value");
+	public void addChild(JsonElement node) {
+		JsonElement children = element.get("children");
 		if(children == null){
-			element.add("value", node.getNode());
+			element.add("children", node);
 		}
 		else if(children.isJsonArray()){
-			children.getAsJsonArray().add(node.getNode());
+			children.getAsJsonArray().add(node);
 		}
 		else {
 			JsonArray array = new JsonArray();
 			array.add(children);
-			array.add(node.getNode());
-			element.add("value", array);
+			array.add(node);
+			element.add("children", array);
 		}
 	}
 
@@ -68,8 +51,33 @@ public class JsonNode implements AstIntermediaryNode<JsonElement> {
 	}
 
 	@Override
-	public void setModifiers(AstIntermediaryNode<JsonElement> modifiers) {
-		element.add("modifiers", modifiers.getNode());
+	public void setProperty(String key, AstIntermediaryNode<JsonElement> node) {
+		if(node != null && isValidKey(key))
+				element.add(key, node.getNode());
 	}
 
+	@Override
+	public void setProperty(String key, String value) {
+		if(value != null && isValidKey(key))
+			element.addProperty(key, value);
+	}
+
+	private boolean isValidKey(String key) {
+		return key != null && !RESERVED_PROPERTY_KEYS.contains(key);
+	}
+
+//	@Override
+//	public void setModifiers(AstIntermediaryNode<JsonElement> modifiers) {
+//		addChild(modifiers);
+//	}
+
+//	@Override
+//	public void setName(Name name) {
+//		element.addProperty("name", name.toString());
+//	}
+//
+//	@Override
+//	public void setType(AstIntermediaryNode<JsonElement> type) {
+//		addChild(type);
+//	}
 }

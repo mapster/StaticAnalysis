@@ -44,15 +44,23 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitArrayAccess(ArrayAccessTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
-		throw new NotDefinedYetException(arg0.getKind().toString());
+	public AstIntermediaryNode<E> visitArrayAccess(ArrayAccessTree arrayAccessTree, Trees trees) {
+		AstIntermediaryNode<E> arrayAccessNode = document.createNode("array_access");
+		setPosition(arrayAccessNode, arrayAccessTree, trees);
+		
+		arrayAccessNode.setProperty("index", scan(arrayAccessTree.getIndex(), trees));
+		arrayAccessNode.setProperty("expr", scan(arrayAccessTree.getExpression(), trees));
+		
+		return arrayAccessNode;
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitArrayType(ArrayTypeTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
-		throw new NotDefinedYetException(arg0.getKind().toString());
+	public AstIntermediaryNode<E> visitArrayType(ArrayTypeTree arrayTypeTree, Trees trees) {
+		AstIntermediaryNode<E> arrayTypeNode = document.createNode("array");
+		setPosition(arrayTypeNode, arrayTypeTree, trees);
+		
+		arrayTypeNode.setProperty("value", scan(arrayTypeTree.getType(), trees));
+		return arrayTypeNode;
 	}
 
 	@Override
@@ -69,10 +77,14 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitBinary(BinaryTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitBinary(BinaryTree binaryTree, Trees trees) {
+		AstIntermediaryNode<E> binaryNode = document.createNode("binary");
+		setPosition(binaryNode, binaryTree, trees);
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		binaryNode.setProperty("left_op", scan(binaryTree.getLeftOperand(), trees));
+		binaryNode.setProperty("right_op", scan(binaryTree.getRightOperand(), trees));
+		
+		return binaryNode;
 	}
 
 	@Override
@@ -111,9 +123,9 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	@Override
 	public AstIntermediaryNode<E> visitClass(ClassTree classTree, Trees trees) {
 		AstIntermediaryNode<E> classNode = document.createNode("class");
-		classNode.setName(classTree.getSimpleName());
 		setPosition(classNode, classTree, trees);
 		
+		classNode.setProperty("name", classTree.getSimpleName().toString());
 		for(AstIntermediaryNode<E> memberNode: scan(classTree.getMembers(), trees)){
 			classNode.addChild(memberNode);
 		}
@@ -180,11 +192,8 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitExpressionStatement(ExpressionStatementTree arg0,
-			Trees arg1) {
-		// TODO Auto-generated method stub
-		
-		throw new NotDefinedYetException(arg0.getKind().toString() + ": " + arg0.toString());
+	public AstIntermediaryNode<E> visitExpressionStatement(ExpressionStatementTree statTree, Trees trees) {
+		return scan(statTree.getExpression(), trees);
 	}
 
 	@Override
@@ -198,7 +207,8 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	public AstIntermediaryNode<E> visitIdentifier(IdentifierTree idTree, Trees trees) {
 		AstIntermediaryNode<E> idNode = document.createNode("identifier");
 		setPosition(idNode, idTree, trees);
-		idNode.setValue(idTree.getName().toString());
+		
+		idNode.setProperty("value", idTree.getName().toString());
 		return idNode;
 	}
 
@@ -233,41 +243,66 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	@Override
 	public AstIntermediaryNode<E> visitLiteral(LiteralTree litTree, Trees trees) {
 		AstIntermediaryNode<E> litNode = document.createNode("literal");
-		litNode.setValue(litTree.getValue() != null ? litTree.getValue().toString() : null);
+		setPosition(litNode, litTree, trees);
 		
+		litNode.setProperty("type", litTree.getKind().toString());
+		if(litTree.getValue() != null){
+			litNode.setProperty("value", litTree.getValue().toString());
+		}
 		return litNode;
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitMemberSelect(MemberSelectTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitMemberSelect(MemberSelectTree memberSelTree, Trees trees) {
+		AstIntermediaryNode<E> memberSelNode = document.createNode("member_select");
+		setPosition(memberSelNode, memberSelTree, trees);
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		memberSelNode.setProperty("expr", scan(memberSelTree.getExpression(), trees));
+		memberSelNode.setProperty("member_id", memberSelTree.getIdentifier().toString());
+		return memberSelNode;
 	}
 
 	@Override
 	public AstIntermediaryNode<E> visitMethod(MethodTree methodTree, Trees trees) {
 		AstIntermediaryNode<E> methodNode = document.createNode("method");
+		setPosition(methodNode, methodTree, trees);
 		
 		//throw exception if defaultValue is set (we don't handle it)
-		if(methodTree.getDefaultValue() != null)
+		if(methodTree.getDefaultValue() != null){
 			throw new NotDefinedYetException("Method default value action not implemented: " + methodTree.getDefaultValue());
-
-		methodNode.setModifiers(scan(methodTree.getModifiers(), trees));
-		methodNode.setName(methodTree.getName());
-		methodNode.setType(scan(methodTree.getReturnType(), trees));
-		methodTree.getParameters();
-		methodTree.getTypeParameters();
-		methodNode.addChild(scan(methodTree.getBody(), trees));
+		}
+		if(methodTree.getTypeParameters() != null && !methodTree.getTypeParameters().isEmpty()){
+			throw new NotDefinedYetException("Method type parameters not implemented: " + methodTree.getTypeParameters());
+		}
+		
+		methodNode.setProperty("modifiers", scan(methodTree.getModifiers(), trees));
+		methodNode.setProperty("name", methodTree.getName().toString());
+		methodNode.setProperty("type", scan(methodTree.getReturnType(), trees));
+		
+		AstIntermediaryNode<E> parameterNode = document.createNode("parameters");
+		for(AstIntermediaryNode<E> node: scan(methodTree.getParameters(), trees)){
+			parameterNode.addChild(node);
+		}
+		methodNode.setProperty("parameters", parameterNode);
+		methodNode.setProperty("body", scan(methodTree.getBody(), trees));
 		
 		return methodNode;
 	}
 	
 	@Override
-	public AstIntermediaryNode<E> visitMethodInvocation(MethodInvocationTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitMethodInvocation(MethodInvocationTree methodCallTree, Trees trees) {
+		AstIntermediaryNode<E> methodCallNode = document.createNode("method_call");
+		setPosition(methodCallNode, methodCallTree, trees);
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		methodCallNode.setProperty("select", scan(methodCallTree.getMethodSelect(), trees));
+		for(AstIntermediaryNode<E> node: scan(methodCallTree.getArguments(), trees)){
+			methodCallNode.addChild(node);
+		}
+
+		if(methodCallTree.getTypeArguments() != null && !methodCallTree.getTypeArguments().isEmpty())
+			throw new NotDefinedYetException("Type arguments for method call not implemented: " + methodCallTree.getTypeArguments());
+
+		return methodCallNode;
 	}
 
 	@Override
@@ -275,10 +310,8 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		AstIntermediaryNode<E> modifiersNode = document.createNode("modifiers");
 		setPosition(modifiersNode, modifiersTree, trees);
 		
-		List<String> mods = new LinkedList<>();
 		for(Modifier m: modifiersTree.getFlags())
-			mods.add(m.toString());
-		modifiersNode.setValue(mods);
+			modifiersNode.addChild(document.createSimpleNode(m.toString()));
 		
 		return modifiersNode;		
 	}
@@ -301,11 +334,11 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		}
 
 		if(newClassTree.getClassBody() != null)
-			throw new NotDefinedYetException("Anonymous class body not implemented: " + newClassTree.getClassBody());
+			throw new NotDefinedYetException("Anonymous class body for new class not implemented: " + newClassTree.getClassBody());
 		if(newClassTree.getEnclosingExpression() != null)
 			throw new NotDefinedYetException("Enclosing expression for new class not implemented: " + newClassTree.getEnclosingExpression());
 		if(newClassTree.getTypeArguments() != null && !newClassTree.getTypeArguments().isEmpty()){
-			throw new NotDefinedYetException("Type arguments not implemented: " + newClassTree.getTypeArguments());
+			throw new NotDefinedYetException("Type arguments for new class not implemented: " + newClassTree.getTypeArguments());
 		}
 		return newClassNode;
 	}
@@ -321,24 +354,24 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	public AstIntermediaryNode<E> visitParameterizedType(ParameterizedTypeTree arg0, Trees arg1) {
 		// TODO Auto-generated method stub
 		
-//		throw new NotDefinedYetException(arg0.getKind().toString());
-		return document.createNode("bla");
+		throw new NotDefinedYetException(arg0.getKind().toString());
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitParenthesized(ParenthesizedTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
-		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+	public AstIntermediaryNode<E> visitParenthesized(ParenthesizedTree parenthesizedTree, Trees trees) {
+		AstIntermediaryNode<E> parenthesizedNode = document.createNode("parenthesized");
+		setPosition(parenthesizedNode, parenthesizedTree, trees);
+
+		parenthesizedNode.setProperty("body", scan(parenthesizedTree.getExpression(), trees));
+		return parenthesizedNode;
 	}
 
 	@Override
 	public AstIntermediaryNode<E> visitPrimitiveType(PrimitiveTypeTree typeTree, Trees trees) {
 		AstIntermediaryNode<E> typeNode = document.createNode("primitive");
-		
-		typeNode.setValue(typeTree.getPrimitiveTypeKind().toString());
 		setPosition(typeNode, typeTree, trees);
 		
+		typeNode.setProperty("value", typeTree.getPrimitiveTypeKind().toString());
 		return typeNode;
 	}
 
@@ -394,10 +427,13 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitUnary(UnaryTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitUnary(UnaryTree unaryTree, Trees trees) {
+		AstIntermediaryNode<E> unaryNode = document.createNode("unary");
+		setPosition(unaryNode, unaryTree, trees);
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		unaryNode.setProperty("type", unaryTree.getKind().toString());
+		unaryNode.setProperty("value", scan(unaryTree.getExpression(), trees));
+		return unaryNode;
 	}
 
 	@Override
@@ -410,21 +446,24 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	@Override
 	public AstIntermediaryNode<E> visitVariable(VariableTree varTree, Trees trees) {
 		AstIntermediaryNode<E> varNode = document.createNode("variable");
-		varNode.setName(varTree.getName());
-		varNode.setType(scan(varTree.getType(), trees));
 		setPosition(varNode, varTree, trees);
-
+		
+		varNode.setProperty("name", varTree.getName().toString());
+		varNode.setProperty("type", scan(varTree.getType(), trees));
 		if(varTree.getInitializer() != null)
-			varNode.addChild(varTree.getInitializer().accept(this, trees));
+			varNode.setProperty("initializer", scan(varTree.getInitializer(), trees));
 
 		return varNode;
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitWhileLoop(WhileLoopTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitWhileLoop(WhileLoopTree whileLoopTree, Trees trees) {
+		AstIntermediaryNode<E> whileLoopNode = document.createNode("while_loop");
+		setPosition(whileLoopNode, whileLoopTree, trees);
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		whileLoopNode.setProperty("condition", scan(whileLoopTree.getCondition(), trees));
+		whileLoopNode.setProperty("body", scan(whileLoopTree.getStatement(), trees));
+		return whileLoopNode;
 	}
 
 	@Override

@@ -12,6 +12,11 @@ public class JsonDocument implements AstIntermediary<JsonElement> {
 	public AstIntermediaryNode<JsonElement> createNode(String name) {
 		return new JsonNode(name);
 	}
+	
+	@Override
+	public JsonElement createSimpleNode(String value) {
+		return new JsonPrimitive(value);
+	}
 
 	@Override
 	public void appendToTopLevel(AstIntermediaryNode<JsonElement> node) {
@@ -29,5 +34,4 @@ public class JsonDocument implements AstIntermediary<JsonElement> {
 			throw new WriteToStreamFailure(e.getMessage());
 		}
 	}
-
 }

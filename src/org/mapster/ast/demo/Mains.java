@@ -1,24 +1,25 @@
 package org.mapster.ast.demo;
 
-public class Main<E> {
+public class Mains<E> {
 	int x;
 	
-	static int x2 = 4;
+	static int x2 = 2;
 	
 	public int metode(){
 		return 0;
 	}
 	
-	public static <T> void main(String[] args){
-		Main m = new Main();
-//		m.method("a");
+	public static void main(String[][] args){
+		Mains m = new Mains();
+		m.method("a", 2);
+		System.out.println(args[1][2]);
 	}
 	
-	public Main(){
+	public Mains(){
 		
 	}
 	
-	public <T> void method(String s){
+	public void method(String streng, int tall){
 		int a = 0;
 		int b = 0;
 		int c = 0;
@@ -26,9 +27,9 @@ public class Main<E> {
 		int x = 0;
 		int y = 0;
 		int z = 0;
+		a++;
 		while(x < 10){
 			System.out.println("hei");
-			a++;
 			b--;
 			while(c < 100){
 				++c;
