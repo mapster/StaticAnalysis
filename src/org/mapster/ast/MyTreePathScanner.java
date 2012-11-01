@@ -85,6 +85,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		AstIntermediaryNode<E> binaryNode = document.createNode("binary");
 		setPosition(binaryNode, binaryTree, trees);
 		
+		binaryNode.setProperty("type", binaryTree.getKind().toString());
 		binaryNode.setProperty("left_op", scan(binaryTree.getLeftOperand(), trees));
 		binaryNode.setProperty("right_op", scan(binaryTree.getRightOperand(), trees));
 		
@@ -157,11 +158,15 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitConditionalExpression(ConditionalExpressionTree arg0,
-			Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitConditionalExpression(ConditionalExpressionTree condExprTree, Trees trees) {
+		AstIntermediaryNode<E> condExprNode = document.createNode("conditional_expr");
+		setPosition(condExprNode, condExprTree, trees);
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		condExprNode.setProperty("condition", scan(condExprTree.getCondition(), trees));
+		condExprNode.setProperty("true_expr", scan(condExprTree.getTrueExpression(), trees));
+		condExprNode.setProperty("false_expr", scan(condExprTree.getFalseExpression(), trees));
+		
+		return condExprNode;
 	}
 
 	@Override
@@ -205,10 +210,31 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitForLoop(ForLoopTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitForLoop(ForLoopTree forLoopTree, Trees trees) {
+		AstIntermediaryNode<E> forLoopNode = document.createNode("for_loop");
+		setPosition(forLoopNode, forLoopTree, trees);
+
+		//set initializer
+		AstIntermediaryNode<E> init = document.createNode("initializer");
+		forLoopNode.setProperty("initializer", init);
+		for(Tree tree: forLoopTree.getInitializer()){
+			init.addChild(scan(tree, trees));
+		}
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		//set condition
+		forLoopNode.setProperty("condition", scan(forLoopTree.getCondition(), trees));
+		
+		//set update
+		AstIntermediaryNode<E> update = document.createNode("update");
+		forLoopNode.setProperty("update", update);
+		for(Tree tree: forLoopTree.getUpdate()){
+			update.addChild(scan(tree, trees));
+		}
+		
+		//set body
+		forLoopNode.setProperty("statement", scan(forLoopTree.getStatement(), trees));
+		
+		return forLoopNode;
 	}
 
 	@Override

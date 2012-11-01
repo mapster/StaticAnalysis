@@ -14,42 +14,42 @@ public class Mains<E> {
 		m.method("a", 2 > 1 ? 2 : 1);
 		System.out.println(args[1][2]);
 		
-		for(int i = 0; i < 10; i++){
+		for(x2=4, m.x=1; x2 < 10; x2++, m.x++){
 			
 		}
+//		
+//		if(m != null){
+//			
+//		}
+//		else if(m == null){
+//			
+//		}
+//		else {
+//			
+//		}
+//		
+//		switch(args[0][0]){
+//		case "a":
+//			break;
+//		case "b":
+//			break;
+//		default:
+//			break;
+//		}
+//			
 		
-		if(m != null){
-			
-		}
-		else if(m == null){
-			
-		}
-		else {
-			
-		}
-		
-		switch(args[0][0]){
-		case "a":
-			break;
-		case "b":
-			break;
-		default:
-			break;
-		}
-			
-		
-		for(String s: args[0]){
-			;
-		}
+//		for(String s: args[0]){
+//			;
+//		}
 	}
 	
 	public Mains(){
-		try{
-			
-		}
-		catch(Exception e){
-			
-		}
+//		try{
+//			
+//		}
+//		catch(Exception e){
+//			
+//		}
 		
 	}
 	
@@ -69,16 +69,16 @@ public class Mains<E> {
 			while(c < 100){
 				++c;
 				--d;
-				break;
+//				break;
 			}
 			z += 1;
 			y = y +1;
-			continue;
+//			continue;
 		}
 		
-		do {
-			;
-		} while(z < 0);
+//		do {
+//			;
+//		} while(z < 0);
 	}
 	
 	public class Bla1 {
