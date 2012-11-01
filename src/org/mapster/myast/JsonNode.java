@@ -5,7 +5,7 @@ import java.util.*;
 import com.google.gson.*;
 
 public class JsonNode implements AstIntermediaryNode<JsonElement> {
-	private static final Set<String> RESERVED_PROPERTY_KEYS = new HashSet<>(Arrays.asList("children", "startPos", "endPos", "NODE_TYPE"));
+	private static final Set<String> RESERVED_PROPERTY_KEYS = new HashSet<>(Arrays.asList("startPos", "endPos", "NODE_TYPE"));
 	private JsonObject element;
 
 	public JsonNode(String nodeType){
@@ -20,8 +20,7 @@ public class JsonNode implements AstIntermediaryNode<JsonElement> {
 		element.addProperty("endPos", end);
 	}
 
-	@Override
-	public void addToProperty(String key, JsonElement value) {
+	private void addToProperty(String key, JsonElement value) {
 		if(value == null || !isValidKey(key))
 			return;
 		
@@ -42,9 +41,12 @@ public class JsonNode implements AstIntermediaryNode<JsonElement> {
 
 	@Override
 	public void addToProperty(String key, AstIntermediaryNode<JsonElement> value) {
+		if(value == null)
+			return;
+		
 		addToProperty(key, value.getNode());
 	}
-
+	
 	@Override
 	public void addToProperty(String key, String value) {
 		addToProperty(key, new JsonPrimitive(value));
@@ -53,6 +55,17 @@ public class JsonNode implements AstIntermediaryNode<JsonElement> {
 	@Override
 	public JsonElement getNode() {
 		return element;
+	}
+	
+	@Override
+	public void setProperty(String key, List<AstIntermediaryNode<JsonElement>> values){
+		if(values == null || !isValidKey(key))
+			return;
+		
+		//clear whatever is stored on that key
+		element.add(key, new JsonArray());
+		for(AstIntermediaryNode<JsonElement> val: values)
+			addToProperty(key, val);
 	}
 
 	@Override
@@ -70,44 +83,4 @@ public class JsonNode implements AstIntermediaryNode<JsonElement> {
 	private boolean isValidKey(String key) {
 		return key != null && !RESERVED_PROPERTY_KEYS.contains(key);
 	}
-	
-//	@Override
-//	public void addChild(AstIntermediaryNode<JsonElement> node) {
-//		if(node == null)
-//			return;
-//		
-//		addChild(node.getNode());
-//	}
-//
-//	@Override
-//	public void addChild(JsonElement node) {
-//		JsonElement children = element.get("children");
-//		if(children == null){
-//			element.add("children", node);
-//		}
-//		else if(children.isJsonArray()){
-//			children.getAsJsonArray().add(node);
-//		}
-//		else {
-//			JsonArray array = new JsonArray();
-//			array.add(children);
-//			array.add(node);
-//			element.add("children", array);
-//		}
-//	}
-	
-//	@Override
-//	public void setModifiers(AstIntermediaryNode<JsonElement> modifiers) {
-//		addChild(modifiers);
-//	}
-
-//	@Override
-//	public void setName(Name name) {
-//		element.addProperty("name", name.toString());
-//	}
-//
-//	@Override
-//	public void setType(AstIntermediaryNode<JsonElement> type) {
-//		addChild(type);
-//	}
 }

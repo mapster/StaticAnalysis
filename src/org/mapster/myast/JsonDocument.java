@@ -14,11 +14,6 @@ public class JsonDocument implements AstIntermediary<JsonElement> {
 	}
 	
 	@Override
-	public JsonElement createSimpleNode(String value) {
-		return new JsonPrimitive(value);
-	}
-
-	@Override
 	public void appendToTopLevel(AstIntermediaryNode<JsonElement> node) {
 		document.add(node.getNode());
 	}

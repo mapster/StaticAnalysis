@@ -96,11 +96,8 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	public AstIntermediaryNode<E> visitBlock(BlockTree blockTree, Trees trees) {
 		AstIntermediaryNode<E> blockNode = document.createNode("block");
 		setPosition(blockNode, blockTree, trees);
-
-		for(AstIntermediaryNode<E> statement: scan(blockTree.getStatements(), trees)){
-			blockNode.addToProperty("statements", statement);
-		}
 		
+		blockNode.setProperty("statements", scan(blockTree.getStatements(), trees));
 		return blockNode;
 	}
 
@@ -118,9 +115,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		setPosition(caseNode, caseTree, trees);
 		
 		caseNode.setProperty("expr", scan(caseTree.getExpression(), trees));
-		for(AstIntermediaryNode<E> stat: scan(caseTree.getStatements(), trees)){
-			caseNode.addToProperty("statements", stat);
-		}
+		caseNode.setProperty("statements", scan(caseTree.getStatements(), trees));
 		
 		return caseNode;
 	}
@@ -139,9 +134,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		
 		classNode.setProperty("modifiers", scan(classTree.getModifiers(), trees));
 		classNode.setProperty("name", classTree.getSimpleName().toString());
-		for(AstIntermediaryNode<E> memberNode: scan(classTree.getMembers(), trees)){
-			classNode.addToProperty("members", memberNode);
-		}
+		classNode.setProperty("members", scan(classTree.getMembers(), trees));
 		
 		return classNode;
 	}
@@ -233,20 +226,9 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		AstIntermediaryNode<E> forLoopNode = document.createNode("for_loop");
 		setPosition(forLoopNode, forLoopTree, trees);
 
-		//set initializer
-		for(Tree tree: forLoopTree.getInitializer()){
-			forLoopNode.addToProperty("initializer", scan(tree, trees));
-		}
-		
-		//set condition
+		forLoopNode.setProperty("initializer", scan(forLoopTree.getInitializer(), trees));
 		forLoopNode.setProperty("condition", scan(forLoopTree.getCondition(), trees));
-		
-		//set update
-		for(Tree tree: forLoopTree.getUpdate()){
-			forLoopNode.addToProperty("update", scan(tree, trees));
-		}
-		
-		//set body
+		forLoopNode.setProperty("update", scan(forLoopTree.getUpdate(), trees));
 		forLoopNode.setProperty("statement", scan(forLoopTree.getStatement(), trees));
 		
 		return forLoopNode;
@@ -332,10 +314,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		methodNode.setProperty("modifiers", scan(methodTree.getModifiers(), trees));
 		methodNode.setProperty("name", methodTree.getName().toString());
 		methodNode.setProperty("type", scan(methodTree.getReturnType(), trees));
-		
-		for(AstIntermediaryNode<E> node: scan(methodTree.getParameters(), trees)){
-			methodNode.addToProperty("parameters", node);
-		}
+		methodNode.setProperty("parameters", scan(methodTree.getParameters(), trees));
 		methodNode.setProperty("body", scan(methodTree.getBody(), trees));
 		
 		return methodNode;
@@ -347,9 +326,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		setPosition(methodCallNode, methodCallTree, trees);
 		
 		methodCallNode.setProperty("select", scan(methodCallTree.getMethodSelect(), trees));
-		for(AstIntermediaryNode<E> arg: scan(methodCallTree.getArguments(), trees)){
-			methodCallNode.addToProperty("arguments", arg);
-		}
+		methodCallNode.setProperty("arguments", scan(methodCallTree.getArguments(), trees));
 
 		if(methodCallTree.getTypeArguments() != null && !methodCallTree.getTypeArguments().isEmpty())
 			throw new NotDefinedYetException("Type arguments for method call not implemented: " + methodCallTree.getTypeArguments());
@@ -384,9 +361,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		setPosition(newClassNode, newClassTree, trees);
 		
 		newClassNode.setProperty("name", scan(newClassTree.getIdentifier(), trees));
-		for(AstIntermediaryNode<E> arg: scan(newClassTree.getArguments(), trees)){
-			newClassNode.addToProperty("arguments", arg);
-		}
+		newClassNode.setProperty("arguments", scan(newClassTree.getArguments(), trees));
 
 		if(newClassTree.getClassBody() != null)
 			throw new NotDefinedYetException("Anonymous class body for new class not implemented: " + newClassTree.getClassBody());
@@ -445,9 +420,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		setPosition(switchNode, switchTree, trees);
 
 		switchNode.setProperty("expr", scan(switchTree.getExpression(), trees));
-		for(AstIntermediaryNode<E> caseNode: scan(switchTree.getCases(), trees)){
-			switchNode.addToProperty("cases", caseNode);
-		}
+		switchNode.setProperty("cases", scan(switchTree.getCases(), trees));
 
 		return switchNode;
 	}
