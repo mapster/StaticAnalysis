@@ -98,7 +98,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		setPosition(blockNode, blockTree, trees);
 
 		for(AstIntermediaryNode<E> statement: scan(blockTree.getStatements(), trees)){
-			blockNode.addChild(statement);
+			blockNode.addToProperty("statements", statement);
 		}
 		
 		return blockNode;
@@ -119,7 +119,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		
 		caseNode.setProperty("expr", scan(caseTree.getExpression(), trees));
 		for(AstIntermediaryNode<E> stat: scan(caseTree.getStatements(), trees)){
-			caseNode.addChild(stat);
+			caseNode.addToProperty("statements", stat);
 		}
 		
 		return caseNode;
@@ -137,9 +137,10 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		AstIntermediaryNode<E> classNode = document.createNode("class");
 		setPosition(classNode, classTree, trees);
 		
+		classNode.setProperty("modifiers", scan(classTree.getModifiers(), trees));
 		classNode.setProperty("name", classTree.getSimpleName().toString());
 		for(AstIntermediaryNode<E> memberNode: scan(classTree.getMembers(), trees)){
-			classNode.addChild(memberNode);
+			classNode.addToProperty("members", memberNode);
 		}
 		
 		return classNode;
@@ -233,20 +234,16 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		setPosition(forLoopNode, forLoopTree, trees);
 
 		//set initializer
-		AstIntermediaryNode<E> init = document.createNode("initializer");
-		forLoopNode.setProperty("initializer", init);
 		for(Tree tree: forLoopTree.getInitializer()){
-			init.addChild(scan(tree, trees));
+			forLoopNode.addToProperty("initializer", scan(tree, trees));
 		}
 		
 		//set condition
 		forLoopNode.setProperty("condition", scan(forLoopTree.getCondition(), trees));
 		
 		//set update
-		AstIntermediaryNode<E> update = document.createNode("update");
-		forLoopNode.setProperty("update", update);
 		for(Tree tree: forLoopTree.getUpdate()){
-			update.addChild(scan(tree, trees));
+			forLoopNode.addToProperty("update", scan(tree, trees));
 		}
 		
 		//set body
@@ -336,11 +333,9 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		methodNode.setProperty("name", methodTree.getName().toString());
 		methodNode.setProperty("type", scan(methodTree.getReturnType(), trees));
 		
-		AstIntermediaryNode<E> parameterNode = document.createNode("parameters");
 		for(AstIntermediaryNode<E> node: scan(methodTree.getParameters(), trees)){
-			parameterNode.addChild(node);
+			methodNode.addToProperty("parameters", node);
 		}
-		methodNode.setProperty("parameters", parameterNode);
 		methodNode.setProperty("body", scan(methodTree.getBody(), trees));
 		
 		return methodNode;
@@ -352,8 +347,8 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		setPosition(methodCallNode, methodCallTree, trees);
 		
 		methodCallNode.setProperty("select", scan(methodCallTree.getMethodSelect(), trees));
-		for(AstIntermediaryNode<E> node: scan(methodCallTree.getArguments(), trees)){
-			methodCallNode.addChild(node);
+		for(AstIntermediaryNode<E> arg: scan(methodCallTree.getArguments(), trees)){
+			methodCallNode.addToProperty("arguments", arg);
 		}
 
 		if(methodCallTree.getTypeArguments() != null && !methodCallTree.getTypeArguments().isEmpty())
@@ -364,11 +359,14 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 
 	@Override
 	public AstIntermediaryNode<E> visitModifiers(ModifiersTree modifiersTree, Trees trees) {
+		if(modifiersTree.getFlags() == null || modifiersTree.getFlags().isEmpty())
+			return null;
+		
 		AstIntermediaryNode<E> modifiersNode = document.createNode("modifiers");
 		setPosition(modifiersNode, modifiersTree, trees);
 		
 		for(Modifier m: modifiersTree.getFlags())
-			modifiersNode.addChild(document.createSimpleNode(m.toString()));
+			modifiersNode.addToProperty("modifiers", m.toString());
 		
 		return modifiersNode;		
 	}
@@ -385,9 +383,9 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		AstIntermediaryNode<E> newClassNode = document.createNode("new");
 		setPosition(newClassNode, newClassTree, trees);
 		
-		newClassNode.addChild(scan(newClassTree.getIdentifier(), trees));
+		newClassNode.setProperty("name", scan(newClassTree.getIdentifier(), trees));
 		for(AstIntermediaryNode<E> arg: scan(newClassTree.getArguments(), trees)){
-			newClassNode.addChild(arg);
+			newClassNode.addToProperty("arguments", arg);
 		}
 
 		if(newClassTree.getClassBody() != null)
@@ -436,7 +434,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	public AstIntermediaryNode<E> visitReturn(ReturnTree returnTree, Trees trees) {
 		AstIntermediaryNode<E> returnNode = document.createNode("return");
 		setPosition(returnNode, returnTree, trees);
-		returnNode.addChild(scan(returnTree.getExpression(), trees));
+		returnNode.setProperty("expr", scan(returnTree.getExpression(), trees));
 		
 		return returnNode;
 	}
@@ -448,7 +446,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 
 		switchNode.setProperty("expr", scan(switchTree.getExpression(), trees));
 		for(AstIntermediaryNode<E> caseNode: scan(switchTree.getCases(), trees)){
-			switchNode.addChild(caseNode);
+			switchNode.addToProperty("cases", caseNode);
 		}
 
 		return switchNode;
@@ -494,7 +492,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		setPosition(unaryNode, unaryTree, trees);
 		
 		unaryNode.setProperty("type", unaryTree.getKind().toString());
-		unaryNode.setProperty("value", scan(unaryTree.getExpression(), trees));
+		unaryNode.setProperty("expr", scan(unaryTree.getExpression(), trees));
 		return unaryNode;
 	}
 
@@ -510,6 +508,7 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		AstIntermediaryNode<E> varNode = document.createNode("variable");
 		setPosition(varNode, varTree, trees);
 		
+		varNode.setProperty("modifiers", scan(varTree.getModifiers(), trees));
 		varNode.setProperty("name", varTree.getName().toString());
 		varNode.setProperty("type", scan(varTree.getType(), trees));
 		if(varTree.getInitializer() != null)

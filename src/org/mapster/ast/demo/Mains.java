@@ -3,7 +3,7 @@ package org.mapster.ast.demo;
 public class Mains<E> {
 	int x;
 	
-	double[] flytTall = new double[10];
+//	double[] flytTall = new double[10];
 	
 	static int x2 = 2;
 	
@@ -44,7 +44,7 @@ public class Mains<E> {
 	}
 	
 	public Mains(){
-		
+
 	}
 	
 	public void method(String streng, int tall){
