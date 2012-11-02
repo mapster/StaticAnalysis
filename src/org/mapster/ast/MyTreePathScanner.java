@@ -30,6 +30,8 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 	
 	public List<AstIntermediaryNode<E>> scan(List<? extends Tree> nodes, Trees trees){
+		if(nodes == null)
+			return null;
 		List<AstIntermediaryNode<E>> elements = new LinkedList<>();
 		for(Tree n: nodes){
 			elements.add(scan(n, trees));
@@ -349,10 +351,15 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitNewArray(NewArrayTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitNewArray(NewArrayTree newArrayTree, Trees trees) {
+		AstIntermediaryNode<E> newArrayNode = document.createNode("new_array");
+		setPosition(newArrayNode, newArrayTree, trees);
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		newArrayNode.setProperty("type", scan(newArrayTree.getType(), trees));
+		newArrayNode.setProperty("dimensions",scan(newArrayTree.getDimensions(), trees));
+		newArrayNode.setProperty("initializer", scan(newArrayTree.getInitializers(), trees));
+		
+		return newArrayNode;
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package org.mapster.ast.demo;
 public class Mains<E> {
 	int x;
 	
-//	double[] flytTall = new double[10];
+	double[][] flytTall = new double[][]{{2.0, 1.0, 3.0}, {4.0, 5.0, 6.0}};
 	
 	static int x2 = 2;
 	
