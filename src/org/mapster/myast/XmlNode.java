@@ -1,5 +1,7 @@
 package org.mapster.myast;
 
+import java.util.List;
+
 import org.w3c.dom.Element;
 
 public class XmlNode implements AstIntermediaryNode<Element> {
@@ -9,17 +11,6 @@ public class XmlNode implements AstIntermediaryNode<Element> {
 		this.element = e;
 	}
 
-//	@Override
-//	public void setName(Name name) {
-//		element.setAttribute("name", name.toString());
-//	}
-//
-//	@Override
-//	public void setType(AstIntermediaryNode<Element> type) {
-//		if(type != null)
-//			element.appendChild(type.getNode());
-//	}
-
 	@Override
 	public void setPosition(long start, long end) {
 		element.setAttribute("startPos", Long.toString(start));
@@ -27,23 +18,12 @@ public class XmlNode implements AstIntermediaryNode<Element> {
 	}
 
 	@Override
-	public void addChild(AstIntermediaryNode<Element> node) {
-		if(node != null)
-			element.appendChild(node.getNode());
-	}
-
-//	@Override
-//	public void setValue(String value) {
-//		element.setTextContent(value);
-//	}
-
-	@Override
-	public Element getNode() {
-		return element;
+	public void addToProperty(String key, AstIntermediaryNode<Element> value) {
+		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void addChild(Element node) {
+	public void addToProperty(String key, String value) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -56,18 +36,20 @@ public class XmlNode implements AstIntermediaryNode<Element> {
 
 	@Override
 	public void setProperty(String key, String value) {
+		
+	}
+
+	@Override
+	public void setProperty(String key,
+			List<AstIntermediaryNode<Element>> values) {
 		// TODO Auto-generated method stub
 		
 	}
 
-//	@Override
-//	public void setModifiers(AstIntermediaryNode<Element> modifiers) {
-////		throw new Error("not implemented yet");
-//	}
-//
-//	@Override
-//	public void setValue(List<String> nodes) {
-////		throw new Error("not implemented yet");		
-//	}
+	@Override
+	public Element getNode() {
+		return element;
+	}
 
+	
 }
