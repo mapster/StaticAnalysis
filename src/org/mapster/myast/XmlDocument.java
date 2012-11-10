@@ -24,19 +24,12 @@ public class XmlDocument implements AstIntermediary<Element> {
 
 	@Override
 	public void appendToTopLevel(AstIntermediaryNode<Element> node) {
-		root.addChild(node);
+//		root.addChild(node);
 	}
 	
 	@Override
 	public AstIntermediaryNode<Element> createNode(String name) {
 		return new XmlNode(document.createElement(name));
-	}
-
-	@Override
-	public Element createSimpleNode(String value) {
-		Element el = document.createElement("item");
-		el.setTextContent(value);
-		return el;
 	}
 
 	@Override
