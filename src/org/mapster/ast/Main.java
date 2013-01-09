@@ -14,7 +14,7 @@ import com.sun.jersey.api.core.*;
 public class Main {
 
 	private static URI getBaseURI() {
-		return UriBuilder.fromUri("http://localhost/").port(9998).build();
+		return UriBuilder.fromUri("http://127.0.0.1/").port(9998).build();
 	}
 	
 	private static final URI BASE_URI = getBaseURI();

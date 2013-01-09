@@ -7,7 +7,8 @@ import java.util.Arrays;
 import javax.tools.*;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -28,10 +29,11 @@ public class CompileResource {
 	@POST
 	@Consumes("text/x-java")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getJson(String sourcecode){
+	public Response getJson(String sourcecode){
+		CompileErrorListener diag = new CompileErrorListener();
 		String json = ""; 
 		try {
-			json = compile(sourcecode);
+			json = compile(sourcecode, diag);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -41,14 +43,18 @@ public class CompileResource {
 		} catch (WriteToStreamFailure e) {
 			e.printStackTrace();
 		}
-		return json;
+		
+		if(diag.isError())
+			return Response.status(Status.BAD_REQUEST).entity("{error: \"Java source file contain compilation errors.\"}").build();
+		
+		return Response.ok(json).build();
 	}
 	
-	private String compile(String sourcecode) throws IOException, ParserConfigurationException, TransformerException, WriteToStreamFailure {
+	private String compile(String sourcecode, CompileErrorListener diag) throws IOException, ParserConfigurationException, TransformerException, WriteToStreamFailure {
 		Iterable<? extends JavaFileObject> compilationUnits = Arrays.asList(new JavaSourceString(sourcecode));
 		
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		CompilationTask task = compiler.getTask(null, null, null, null, null, compilationUnits);		
+		CompilationTask task = compiler.getTask(null, null, diag, null, null, compilationUnits);		
 		JavacTask javacTask = (JavacTask) task;
 
 		Trees trees = Trees.instance(task);
@@ -76,5 +82,21 @@ public class CompileResource {
 		public CharSequence getCharContent(boolean ignoreEncodingErrors){
 			return sourcecode;
 		}
+	}
+	
+	static class CompileErrorListener implements DiagnosticListener<JavaFileObject> {
+		
+		private boolean error = false;
+		
+		public boolean isError(){
+			return error;
+		}
+
+		@Override
+		public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
+			if(Diagnostic.Kind.ERROR.equals(diagnostic.getKind()))
+				error = true;
+		}
+		
 	}
 }
