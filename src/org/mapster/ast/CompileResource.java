@@ -2,7 +2,7 @@ package org.mapster.ast;
 
 import java.io.*;
 import java.net.URI;
-import java.util.Arrays;
+import java.util.*;
 
 import javax.tools.*;
 import javax.tools.JavaCompiler.CompilationTask;
@@ -14,7 +14,7 @@ import javax.xml.transform.TransformerException;
 
 import org.mapster.myast.*;
 
-import com.google.gson.JsonElement;
+import com.google.gson.*;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.util.*;
 
@@ -34,18 +34,13 @@ public class CompileResource {
 		String json = ""; 
 		try {
 			json = compile(sourcecode, diag);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		} catch (WriteToStreamFailure e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{error: \"unable to build AST\", details: \""+e.getMessage()+"\"}").build();
 		}
-		
-		if(diag.isError())
-			return Response.status(Status.BAD_REQUEST).entity("{error: \"Java source file contain compilation errors.\"}").build();
+		if(diag.isError()){
+			Gson gson = new Gson();
+			return Response.status(Status.BAD_REQUEST).entity(gson.toJson(diag.diags)).build();
+		}
 		
 		return Response.ok(json).build();
 	}
@@ -59,12 +54,13 @@ public class CompileResource {
 
 		Trees trees = Trees.instance(task);
 		JsonDocument jsonDoc = new JsonDocument();
-
+		
 		MyTreePathScanner<JsonElement> jsonScanner = new MyTreePathScanner<>(jsonDoc);
 		for(CompilationUnitTree tree: javacTask.parse()){
 			jsonScanner.buildDocument(tree, trees);
 		}
 
+		javacTask.analyze();
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		jsonDoc.writeToStream(os);
 		return os.toString();
@@ -85,17 +81,26 @@ public class CompileResource {
 	}
 	
 	static class CompileErrorListener implements DiagnosticListener<JavaFileObject> {
-		
-		private boolean error = false;
+		List<ErrorDiag> diags = new LinkedList<>();
 		
 		public boolean isError(){
-			return error;
+			return !diags.isEmpty();
 		}
 
 		@Override
 		public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-			if(Diagnostic.Kind.ERROR.equals(diagnostic.getKind()))
-				error = true;
+			diags.add(new ErrorDiag(diagnostic.getKind(), diagnostic.getMessage(null)));
+		}
+		
+	}
+	
+	static class ErrorDiag {
+		final String kind;
+		final String message;
+
+		public ErrorDiag(Diagnostic.Kind kind, String message) {
+			this.kind = kind.toString();
+			this.message = message;
 		}
 		
 	}
