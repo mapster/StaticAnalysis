@@ -267,10 +267,13 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitImport(ImportTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
+	public AstIntermediaryNode<E> visitImport(ImportTree importTree, Trees trees) {
+		AstIntermediaryNode<E> importNode = document.createNode("import");
 		
-		throw new NotDefinedYetException(arg0.getKind().toString());
+		importNode.setProperty("id", importTree.getQualifiedIdentifier().accept(this, trees));
+		importNode.setProperty("static", Boolean.toString(importTree.isStatic()));
+		
+		return importNode;
 	}
 
 	@Override
