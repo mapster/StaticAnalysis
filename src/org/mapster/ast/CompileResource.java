@@ -29,13 +29,13 @@ public class CompileResource {
 	@POST
 	@Consumes("text/x-java")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getJson(String sourcecode){
+	public Response getJson(String sourcecode) {
 		CompileErrorListener diag = new CompileErrorListener();
 		String json = ""; 
 		try {
 			json = compile(sourcecode, diag);
-		} catch (Exception e) {
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{error: \"unable to build AST\", details: \""+e.getMessage()+"\"}").build();
+		} catch (Exception | Error e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{error: \"unable to build AST\", details: \""+e+"\"}").build();
 		}
 		if(diag.isError()){
 			Gson gson = new Gson();
@@ -57,7 +57,7 @@ public class CompileResource {
 		
 		MyTreePathScanner<JsonElement> jsonScanner = new MyTreePathScanner<>(jsonDoc);
 		for(CompilationUnitTree tree: javacTask.parse()){
-			jsonScanner.buildDocument(tree, trees);
+			jsonScanner.addUnitToDocument(tree, trees);
 		}
 
 		javacTask.analyze();

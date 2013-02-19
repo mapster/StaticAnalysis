@@ -10,4 +10,8 @@ public class NotDefinedYetException extends Error {
 	public NotDefinedYetException(String msg) {
 		super(msg);
 	}
+	
+	public String toString(){
+		return "Doesn't support transformation of "+this.getMessage()+" nodes yet.";
+	}
 }

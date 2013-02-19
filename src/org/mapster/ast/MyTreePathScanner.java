@@ -18,11 +18,20 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		this.document = document;
 	}
 
-	public void buildDocument(CompilationUnitTree treeNode, Trees trees) {
+	public void addUnitToDocument(CompilationUnitTree treeNode, Trees trees) {
 		this.compilationUnit = treeNode;
-		for(Tree node: treeNode.getTypeDecls()){
-			document.appendToTopLevel(node.accept(this, trees));
+		AstIntermediaryNode<E> unit = document.createNode("compile_unit");
+		
+		if(treeNode.getPackageName() != null){
+			unit.setProperty("package", treeNode.getPackageName().accept(this, trees));
 		}
+		for(Tree tree: treeNode.getImports()){
+			unit.addToProperty("imports", tree.accept(this, trees));
+		}
+		for(Tree node: treeNode.getTypeDecls()){
+			unit.addToProperty("type_declarations", node.accept(this, trees));
+		}
+		document.appendToTopLevel(unit);
 	}
 
 	public AstIntermediaryNode<E> scan(Tree node, Trees trees){
