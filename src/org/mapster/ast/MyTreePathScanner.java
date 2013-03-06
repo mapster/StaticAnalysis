@@ -7,6 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.mapster.myast.*;
 
 import com.sun.source.tree.*;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.Trees;
 
 
@@ -297,7 +298,11 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 		
 		litNode.setProperty("type", litTree.getKind().toString());
 		if(litTree.getValue() != null){
-			litNode.setProperty("value", litTree.getValue().toString());
+			String value = litTree.getValue().toString();
+			if(litTree.getKind().equals(Kind.CHAR_LITERAL))
+				value = Integer.toString((int)((Character)litTree.getValue()));
+				
+			litNode.setProperty("value", value);
 		}
 		return litNode;
 	}
