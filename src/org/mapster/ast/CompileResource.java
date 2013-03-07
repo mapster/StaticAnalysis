@@ -31,9 +31,6 @@ public class CompileResource {
 	@Consumes("text/x-java")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getJson(@PathParam("filename") String filename, String sourcecode) {
-		System.out.println(filename);
-		System.out.println(sourcecode);
-		
 		CompileErrorListener diag = new CompileErrorListener();
 		String json = ""; 
 		try {
