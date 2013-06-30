@@ -1,4 +1,9 @@
 <project name="StaticAnalysis" default="run" basedir=".">
+    <property name="lib.dir" value="lib"/>
+
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
 
 	<!-- Generate folders -->
 	<target name="init">
@@ -7,18 +12,16 @@
 
 	<!-- Compiling -->
 	<target name="compile" depends="init">
-        <javac srcdir="src" destdir="build/classes">
-		</javac>
+        <javac srcdir="src" destdir="build/classes" classpathref="classpath"/>
 	</target>
 
 	<!-- Run jar-archive -->
 	<target name="run" depends="compile">
-        <java classname="org.mapster.ast.CompileTest">
+        <java classname="org.mapster.ast.Main">
             <classpath>
-                <pathelement path="build/classes"/>
-                <pathelement path="lib/tools.jar"/>
+                <path refid="classpath"/>
+                <path location="build/classes"/>
             </classpath>
-            <arg value="src/org/mapster/ast/demo/Main.java"/>
         </java>
 	</target>
 
