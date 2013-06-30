@@ -51,8 +51,9 @@ public class CompileResource {
 		
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		CompilationTask task = compiler.getTask(null, null, diag, null, null, compilationUnits);		
-		JavacTask javacTask = (JavacTask) task;
-
+//		JavacTask javacTask = (JavacTask) task;
+		com.sun.tools.javac.api.JavacTaskImpl javacTask = (com.sun.tools.javac.api.JavacTaskImpl) task;
+		
 		Trees trees = Trees.instance(task);
 		JsonDocument jsonDoc = new JsonDocument();
 		
