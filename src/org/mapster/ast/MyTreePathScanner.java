@@ -76,9 +76,14 @@ public class MyTreePathScanner<E> implements TreeVisitor<AstIntermediaryNode<E>,
 	}
 
 	@Override
-	public AstIntermediaryNode<E> visitAssert(AssertTree arg0, Trees arg1) {
-		// TODO Auto-generated method stub
-		throw new NotDefinedYetException(arg0.getKind().toString());
+	public AstIntermediaryNode<E> visitAssert(AssertTree assertTree, Trees trees) {
+		AstIntermediaryNode<E> assertNode = document.createNode("assert");
+		setPosition(assertNode, assertTree, trees);
+		
+		assertNode.setProperty("condition", scan(assertTree.getCondition(), trees));
+		assertNode.setProperty("detail", scan(assertTree.getDetail(), trees));
+		
+		return assertNode;
 	}
 
 	@Override
